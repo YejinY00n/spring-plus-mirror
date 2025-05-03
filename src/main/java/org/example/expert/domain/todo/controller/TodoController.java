@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// Lv1 : @Transaction(read-only=true) 제거
 @RestController
 @RequiredArgsConstructor
 public class TodoController {
