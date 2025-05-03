@@ -44,9 +44,9 @@ public class JwtFilter implements Filter {
             httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "JWT 토큰이 필요합니다.");
             return;
         }
-
+        log.info("BEARER TOKEN: {}", bearerJwt);
         String jwt = jwtUtil.substringToken(bearerJwt);
-
+        log.info("TOKEN: {}", jwt);
         try {
             // JWT 유효성 검사와 claims 추출
             Claims claims = jwtUtil.extractClaims(jwt);
