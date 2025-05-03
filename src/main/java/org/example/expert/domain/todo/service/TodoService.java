@@ -1,5 +1,8 @@
 package org.example.expert.domain.todo.service;
 
+import jakarta.annotation.Nullable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.example.expert.client.WeatherClient;
 import org.example.expert.domain.common.dto.AuthUser;
@@ -46,10 +49,54 @@ public class TodoService {
         );
     }
 
-    public Page<TodoResponse> getTodos(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+    public Page<TodoResponse> getTodos(
+        int page, int size,
+        @Nullable String weather,
+        @Nullable LocalDate modifiedStart, @Nullable LocalDate modifiedEnd) {
+        // 날짜 유효 검증
+        if(modifiedStart != null || modifiedEnd != null) {
+            if(modifiedStart != null && modifiedStart.isAfter(LocalDate.now())) {
+                throw new InvalidRequestException("현재 이전의 날짜부터 검색 가능합니다.");
+            }
+            if(modifiedEnd != null && modifiedEnd.isAfter(LocalDate.now())) {
+                throw new InvalidRequestException("현재 이전의 날짜까지 검색 가능합니다.");
+            }
+            if(modifiedStart != null && modifiedEnd != null && modifiedStart.isAfter(modifiedEnd)) {
+                throw new InvalidRequestException("검색 시작일은 검색 끝일보다 이전이어야 합니다.");
+            }
+        }
 
-        Page<Todo> todos = todoRepository.findAllByOrderByModifiedAtDesc(pageable);
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Todo> todos;
+
+        if(weather != null && (modifiedStart != null || modifiedEnd != null)) {
+            if(modifiedStart == null) {
+                todos = todoRepository.findAllByWeatherUntilModifiedAtAndOrder(pageable, weather, modifiedEnd);
+            }
+            else if(modifiedEnd == null) {
+                todos = todoRepository.findAllByWeatherBeginModifiedAtAndOrder(pageable, weather, modifiedStart);
+            }
+            else {
+                todos = todoRepository.findAllByWeatherBetweenModifiedAtAndOrder(pageable, weather, modifiedStart, modifiedEnd);
+            }
+        }
+        else if(weather != null) {
+            todos = todoRepository.findAllByWeatherAndOrder(pageable, weather);
+        }
+        else if(modifiedStart != null || modifiedEnd != null) {
+            if(modifiedStart == null) {
+                todos = todoRepository.findAllUntilModifiedAtAndOrder(pageable, modifiedEnd);
+            }
+            else if(modifiedEnd == null) {
+                todos = todoRepository.findAllBeginModifiedAtAndOrder(pageable, modifiedStart);
+            }
+            else {
+                todos = todoRepository.findAllBetweenModifiedAtAndOrder(pageable, modifiedStart, modifiedEnd);
+            }
+        }
+        else {
+            todos = todoRepository.findAllByOrderByModifiedAtDesc(pageable);
+        }
 
         return todos.map(todo -> new TodoResponse(
                 todo.getId(),
