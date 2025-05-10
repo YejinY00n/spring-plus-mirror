@@ -1,13 +1,14 @@
 package org.example.expert.domain.auth.dto.response;
 
 import lombok.Getter;
+import org.example.expert.config.jwt.dto.JwtToken;
 
 @Getter
 public class SigninResponse {
 
-    private final String bearerToken;
+    private final JwtToken jwtToken;
 
-    public SigninResponse(String bearerToken) {
-        this.bearerToken = bearerToken;
+    public SigninResponse(JwtToken jwtToken) {
+        this.jwtToken = jwtToken;
     }
 }

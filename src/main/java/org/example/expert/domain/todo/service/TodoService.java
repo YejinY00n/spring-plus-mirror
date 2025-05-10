@@ -5,11 +5,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.example.expert.client.WeatherClient;
+import org.example.expert.config.security.CustomUserDetails;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.todo.dto.request.TodoSaveRequest;
 import org.example.expert.domain.todo.dto.response.TodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
+import org.example.expert.domain.todo.dto.response.TodoSearchDto;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.todo.repository.TodoRepository;
 import org.example.expert.domain.todo.repository.TodoRepositoryImpl;
@@ -28,8 +30,8 @@ public class TodoService {
     private final TodoRepository todoRepository;
     private final WeatherClient weatherClient;
 
-    public TodoSaveResponse saveTodo(AuthUser authUser, TodoSaveRequest todoSaveRequest) {
-        User user = User.fromAuthUser(authUser);
+    public TodoSaveResponse saveTodo(CustomUserDetails userDetails, TodoSaveRequest todoSaveRequest) {
+        User user = User.fromAuthDetails(userDetails);
 
         String weather = weatherClient.getTodayWeather();
 
@@ -109,6 +111,16 @@ public class TodoService {
                 todo.getCreatedAt(),
                 todo.getModifiedAt()
         ));
+    }
+
+    public Page<TodoSearchDto> getTodosV2(
+        int page, int size,
+        String keyword, String managerNickname,
+        LocalDate createdStart, LocalDate createdEnd) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return todoRepository.findAllByCondition(
+            pageable, keyword, managerNickname,
+            createdStart, createdEnd);
     }
 
     public TodoResponse getTodo(long todoId) {
