@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.expert.config.security.CustomUserDetails;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
+import org.example.expert.domain.log.entity.Log;
+import org.example.expert.domain.log.repository.LogRepository;
+import org.example.expert.domain.log.service.LogService;
 import org.example.expert.domain.manager.dto.request.ManagerSaveRequest;
 import org.example.expert.domain.manager.dto.response.ManagerResponse;
 import org.example.expert.domain.manager.dto.response.ManagerSaveResponse;
@@ -15,6 +18,7 @@ import org.example.expert.domain.user.dto.response.UserResponse;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
@@ -25,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ManagerService {
+    private final LogService logService;
 
     private final ManagerRepository managerRepository;
     private final UserRepository userRepository;
@@ -34,6 +39,9 @@ public class ManagerService {
     public ManagerSaveResponse saveManager(CustomUserDetails userDetails, long todoId, ManagerSaveRequest managerSaveRequest) {
         // 일정을 만든 유저
         User user = User.fromAuthDetails(userDetails);
+
+        logService.saveManagerRegisterRequest(user.getId(), managerSaveRequest.getManagerUserId());
+
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new InvalidRequestException("Todo not found"));
 
