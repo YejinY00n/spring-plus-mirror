@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.example.expert.config.security.CustomUserDetails;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.entity.Timestamped;
+import org.example.expert.domain.image.entity.Image;
 import org.example.expert.domain.user.enums.UserRole;
 
 @Getter
@@ -26,6 +28,10 @@ public class User extends Timestamped {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name="image_id")
+    @Setter
+    private Image profile;
 
     public User(String email, String password, UserRole userRole, String nickname) {
         this.email = email;
@@ -55,4 +61,6 @@ public class User extends Timestamped {
     public void updateRole(UserRole userRole) {
         this.userRole = userRole;
     }
+
+    public void removeProfile() { this.profile = null; }
 }
