@@ -39,6 +39,7 @@ public class SecurityConfig {
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))   // 세션을 생성하지 않도록 설정합니다.
         .authorizeHttpRequests((auth) -> {
           auth.requestMatchers("/auth/**").permitAll();
+          auth.requestMatchers("/health").permitAll();
           auth.requestMatchers("/manager/**")
               .hasAnyAuthority("ADMIN", "MANAGER");
           auth.requestMatchers("/admin/**")
