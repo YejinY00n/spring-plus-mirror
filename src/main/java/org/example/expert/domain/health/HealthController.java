@@ -1,4 +1,4 @@
-package org.example.expert.health;
+package org.example.expert.domain.health;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

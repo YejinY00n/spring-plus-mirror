@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class ExecutionTimeLoggingAspect {
-  @Around("execution(* org.example.expert.domain.user.controller.UserController.findByNickname(..))")
+  @Around("@annotation(org.example.expert.domain.common.annotation.ExecutionLoggable)")
   public Object logAroundExecution(ProceedingJoinPoint joinPoint) throws Throwable{
     long start = System.currentTimeMillis();
     log.info("START EXECUTION: "+joinPoint.toString());

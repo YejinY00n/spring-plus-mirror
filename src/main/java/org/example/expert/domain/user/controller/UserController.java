@@ -3,6 +3,7 @@ package org.example.expert.domain.user.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.expert.config.security.CustomUserDetails;
+import org.example.expert.domain.common.annotation.ExecutionLoggable;
 import org.example.expert.domain.user.dto.request.UserChangePasswordRequest;
 import org.example.expert.domain.user.dto.response.UserResponse;
 import org.example.expert.domain.user.service.UserService;
@@ -24,6 +25,7 @@ public class UserController {
     }
 
     // 닉네임 일치하는 유저 목록 조회
+    @ExecutionLoggable
     @GetMapping("/users")
     public ResponseEntity<List<UserResponse>> findByNickname(@RequestParam String nickname) {
         return ResponseEntity.ok(userService.findByNickname(nickname));
